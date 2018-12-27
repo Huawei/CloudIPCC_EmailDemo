@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huawei.adapter.dao.intf.SessionDAO">
+
+	<delete id = "deleteAllSession">
+		delete from t_wecc_session
+	</delete>
+
+	<delete id = "batchDeleteSession">
+		delete from t_wecc_session where cluster_id = #{clusterId, jdbcType=VARCHAR} and
+		 <foreach collection="sessions" item="session" open="(" separator=" or " close=")" index="index">
+            (vdnId = #{session.vdnId, jdbcType=INTEGER} and accesscode = #{session.accessCode, jdbcType=VARCHAR} 
+            	and sessionUserName = #{session.sessionUserName, jdbcType=VARCHAR})
+        </foreach>
+	</delete>
+
+	<update id = "updateSession" parameterType="Session">
+		update t_wecc_session
+		set connect_time = now()
+		where vdnId = #{vdnId, jdbcType=INTEGER} 
+			and sessionUserName = #{sessionUserName, jdbcType=VARCHAR} 
+			and accesscode = #{accessCode, jdbcType=VARCHAR} 
+	</update>
+
+	<select id = "cleanTimeoutSession">
+		<![CDATA[
+			{call P_CLEANTIMEOUT()}
+		]]>
+	</select>
+</mapper>

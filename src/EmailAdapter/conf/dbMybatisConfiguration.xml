@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>  
+        <!-- 设置超时时间，它决定驱动等待一个数据库响应的时间  -->  
+        <setting name="defaultStatementTimeout" value="300"/>  
+    </settings>
+	
+	<typeAliases>
+        <typeAlias alias="Session" type="com.huawei.adapter.bean.Session" />
+        <typeAlias alias="Message" type="com.huawei.adapter.bean.Message" />
+    </typeAliases>
+    
+	<environments default="development">   
+		<environment id="db">   
+			<transactionManager type="JDBC"/>   
+			<dataSource type="POOLED">   
+				<property name="driver" value="${DB_DB_CONNECT_DRIVER}"/>   
+				<property name="url" value="${DB_DB_CONNECT_URL}"/> 
+				<property name="username" value="${DB_DB_CONNECT_NAME}"/>   
+				<property name="password" value="${DB_DB_CONNECT_PASSWORD}"/>   
+				<property name="poolMaximumActiveConnections" value="15"/>     
+			</dataSource>   
+		</environment>
+	</environments>   
+	
+    <mappers>
+       <mapper resource="dbMapper/${DB_DBTYPE}Mapper/SessionMapper.xml"/> 
+       <mapper resource="dbMapper/${DB_DBTYPE}Mapper/ServerStatusMapper.xml"/>
+       <mapper resource="dbMapper/${DB_DBTYPE}Mapper/MessageMapper.xml"/> 
+    </mappers>
+</configuration>

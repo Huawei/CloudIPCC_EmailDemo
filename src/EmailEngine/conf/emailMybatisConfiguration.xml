@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>  
+        <!-- 设置超时时间，它决定驱动等待一个数据库响应的时间  -->  
+        <setting name="defaultStatementTimeout" value="300"/>  
+    </settings>
+    
+    <typeAliases>
+        <typeAlias alias="EmailMessage" type="com.huawei.prometheus.comm.bean.email.EmailMessage"/>
+        <typeAlias alias="AttachFile" type="com.huawei.prometheus.comm.bean.email.AttachFile" />
+    </typeAliases>
+	
+	<environments default="development">   
+		<environment id="email">   
+			<transactionManager type="JDBC"/>   
+			<dataSource type="POOLED">   
+				<property name="driver" value="${EMAIL_DB_CONNECT_DRIVER}"/>   
+				<property name="url" value="${EMAIL_DB_CONNECT_URL}"/> 
+				<property name="username" value="${EMAIL_DB_CONNECT_NAME}"/>   
+				<property name="password" value="${EMAIL_DB_CONNECT_PASSWORD}"/>    
+			</dataSource>   
+		</environment>
+	</environments>   
+	
+    <mappers>
+       <mapper resource="${EMAIL_DBTYPE}Mapper/EmailMessageDAO.xml"/>
+
+    </mappers>
+</configuration>

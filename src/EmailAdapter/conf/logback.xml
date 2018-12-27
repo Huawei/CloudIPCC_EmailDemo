@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration scan="true" scanPeriod="30 seconds">
+    
+    <property name="log.dir" value="${catalina.base}/logs/EmailAdapter" />
+    
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%-30method] [%msg] [%thread] [%file:%line]%n</pattern>
+        </encoder>
+    </appender>
+    
+    <appender name="CATALINA" class="ch.qos.logback.core.rolling.RollingFileAppender">  
+        <file>${catalina.base}/logs/catalina.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">  
+             <fileNamePattern>${catalina.base}/logs/catalina.%i.log.zip</fileNamePattern>  
+             <minIndex>1</minIndex>  
+             <maxIndex>10</maxIndex>  
+        </rollingPolicy>  
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">  
+            <maxFileSize>10MB</maxFileSize>  
+        </triggeringPolicy>  
+        <encoder>  
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%-30method] [%msg] [%thread] [%file:%line]%n</pattern>  
+        </encoder>  
+	</appender>
+    
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">  
+        <file>${log.dir}/email.log</file>  
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">  
+             <fileNamePattern>${log.dir}/iot.%i.log.zip</fileNamePattern>  
+             <minIndex>1</minIndex>  
+             <maxIndex>10</maxIndex>  
+        </rollingPolicy>  
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">  
+            <maxFileSize>100MB</maxFileSize>  
+        </triggeringPolicy>  
+        <encoder>  
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%-30method] [%msg] [%thread] [%file:%line]%n</pattern>  
+        </encoder>  
+    </appender>
+
+  
+	<appender name="COMMON" class="ch.qos.logback.core.rolling.RollingFileAppender">  
+        <file>${log.dir}/common.log</file>  
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">  
+             <fileNamePattern>${log.dir}/common.%i.log.zip</fileNamePattern>  
+             <minIndex>1</minIndex>  
+             <maxIndex>2</maxIndex>  
+        </rollingPolicy>  
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">  
+            <maxFileSize>10MB</maxFileSize>  
+        </triggeringPolicy>  
+        <encoder>  
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%-30method] [%msg] [%thread] [%file:%line]%n</pattern>  
+        </encoder>  
+    </appender>
+    
+     <appender name="EVENT" class="ch.qos.logback.core.rolling.RollingFileAppender">  
+        <file>${log.dir}/event.log</file>  
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">  
+             <fileNamePattern>${log.dir}/event.%i.log.zip</fileNamePattern>  
+             <minIndex>1</minIndex>  
+             <maxIndex>10</maxIndex>  
+        </rollingPolicy>  
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">  
+            <maxFileSize>100MB</maxFileSize>  
+        </triggeringPolicy>  
+        <encoder>  
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%-30method] [%msg] [%thread] [%file:%line]%n</pattern>  
+        </encoder>  
+    </appender>
+   
+    <appender name="SESSION" class="ch.qos.logback.core.rolling.RollingFileAppender">  
+        <file>${log.dir}/session.log</file>  
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">  
+             <fileNamePattern>${log.dir}/session.%i.log.zip</fileNamePattern>  
+             <minIndex>1</minIndex>  
+             <maxIndex>10</maxIndex>  
+        </rollingPolicy>  
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">  
+            <maxFileSize>100MB</maxFileSize>  
+        </triggeringPolicy>  
+        <encoder>  
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%-30method] [%msg] [%thread] [%file:%line]%n</pattern>  
+        </encoder>  
+    </appender>
+    
+    
+    
+    <logger name="com.huawei.adapter" level="ERROR" additivity="false">
+        <appender-ref ref="COMMON" />
+    </logger>
+    <logger name="com.huawei.adapter.startup.StartupListener" level="INFO" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    <logger name="com.huawei.adapter.common.data" level="INFO" additivity="false">
+        <appender-ref ref="SESSION" />
+    </logger>
+    <logger name="com.huawei.adapter.session" level="DEBUG" additivity="false">
+        <appender-ref ref="SESSION" />
+    </logger>
+    <logger name="com.huawei.adapter.icsevent.EventReceiveServlet" level="INFO" additivity="false">
+        <appender-ref ref="EVENT" />
+    </logger>
+    <root level="ERROR">
+        <appender-ref ref="FILE" />
+    </root>
+    
+</configuration>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huawei.prometheus.dao.EmailMessageDAO">
+	 <insert id="saveFile" parameterType="map">
+    	<selectKey resultType="String" keyProperty="id" order="BEFORE">
+			SELECT SEQ_WECC_FILE.NEXTVAL  as id FROM DUAL  
+  		</selectKey>
+  		
+        INSERT INTO T_WECC_FILE_EMAIL(ID, FILENAME, CONTENT_PATH)
+        	VALUES (#{id, jdbcType=VARCHAR}, #{fileName, jdbcType=VARCHAR}, #{contentPath, jdbcType=VARCHAR})
+    </insert>
+    
+      
+    <select id="getFile" parameterType="map" resultType="java.util.Map">
+		 select t1.content_path 
+		 from T_WECC_FILE_EMAIL t1
+		  <where>
+		  	<if test="id!=null">t1.id = #{id}</if>
+		  </where>
+    </select>
+    
+    
+    <insert id="createMessage" parameterType="EmailMessage">
+    	<selectKey resultType="String" keyProperty="id" order="BEFORE">
+			SELECT SEQ_WECC_EMAILMESSAGE.NEXTVAL  as id FROM DUAL  
+  		</selectKey>
+  		
+        INSERT INTO T_WECC_EMAILMESSAGE 
+               (ID,TYPE,UPDATETIME,CALLTIMES,STATUS,
+               ACCESSCODE,CONTENT,ORIGENMESSAGEID,EMAIL_UID,SUBJECT,SENDDATE,
+	       TEXTCONTENT,HTMLCONTENT,CC,BCC,EMAIL_FROM,EMAIL_TO,HANDLER
+               ,START_TIME)
+        VALUES (#{id, jdbcType=VARCHAR},#{type, jdbcType=VARCHAR}, 
+        		sysdate, #{callTime, jdbcType=INTEGER},
+               #{status, jdbcType=INTEGER},#{accessCode, jdbcType=VARCHAR},#{content, jdbcType=VARCHAR},
+               #{origenMessageId, jdbcType=VARCHAR},
+               #{uid, jdbcType=VARCHAR}, #{subject, jdbcType=VARCHAR},#{sendDate, jdbcType=TIMESTAMP},
+               #{textContent, jdbcType=VARCHAR},#{htmlContent, jdbcType=VARCHAR},#{cc, jdbcType=VARCHAR},
+               #{bcc, jdbcType=VARCHAR}, #{from, jdbcType=VARCHAR}, #{to, jdbcType=VARCHAR}, #{handler, jdbcType=NUMERIC} 
+               ,#{startTime, jdbcType=TIMESTAMP})
+    </insert>
+    
+     <insert id="createEmailAttach" parameterType="AttachFile">
+        INSERT INTO T_WECC_EMAILATTACH 
+               (ATTACH_FILE_ID,FILENAME,TYPE,EMAILMESSAGE_ID)
+        VALUES (#{id, jdbcType=VARCHAR},#{fileName, jdbcType=VARCHAR}, #{type, jdbcType=VARCHAR}, #{emailMessageId, jdbcType=VARCHAR})
+    </insert>
+    
+     <select id="getAttachList" parameterType="String" resultType="AttachFile">
+		 select 
+		 	ATTACH_FILE_ID  as id,
+		 	FILENAME        as fileName,
+		 	TYPE            as type,
+		 	EMAILMESSAGE_ID as emailMessageId 
+		 from T_WECC_EMAILATTACH t1
+		  where
+		   t1.EMAILMESSAGE_ID = #{value}
+    </select>
+    
+    
+      <select id="getNeedToSendMailList" parameterType="map" resultType="EmailMessage">
+    	SELECT 
+    	    ID as id,
+    		CALLTIMES as callTime,
+    		STATUS as status,
+    		ACCESSCODE as accessCode,
+    		CONTENT as content,
+    		ORIGENMESSAGEID  as origenMessageId,
+    		SUBJECT as subject,
+    		SENDDATE as sendDate,
+    		TEXTCONTENT as textContent,
+    		HTMLCONTENT as htmlContent,
+    		CC as cc,
+    		BCC as bcc,
+    		EMAIL_TO as "to",
+    		TYPE as type,
+    		EMAIL_UID as "uid",
+    		EMAIL_FROM as "from",
+    		HANDLER as "handler"    		
+        from  (( select b.*, rownum row_num from  ( select a.* from T_WECC_EMAILMESSAGE a 
+			where 
+	        	<if test="condition.type != null">
+	        	   a.TYPE = #{condition.type}
+	        	</if>
+	        	<if test="condition.from != null">
+	        	   AND  a.EMAIL_FROM = #{condition.from}
+	        	</if>
+	        	 AND a.STATUS IN (1,4)
+        	   ) b ) c )
+        	   where <![CDATA[ c.row_num <=  #{count} ]]> 
+    </select>
+    
+    
+     <update id="updateMessage" timeout="600" parameterType="map">
+		update T_WECC_EMAILMESSAGE t 
+		<set>
+			STATUS = #{update.status,jdbcType=NUMERIC}, 
+			UPDATETIME = #{update.updateTime,jdbcType=NUMERIC}
+			
+			<if test="update.failInfo != null">
+             , FAIL_INFO =  #{update.failInfo, jdbcType=VARCHAR}
+	        </if>
+			
+			<if test="update.callTime != null">
+             , CALLTIMES =  CALLTIMES + 1 
+	        </if>
+			
+			<if test="update.handler != null">
+             , HANDLER =  #{update.handler, jdbcType=NUMERIC}
+	        </if>
+		</set>
+		 <where> 
+		 <if test="condition.id != null">
+       	    t.ID = #{condition.id}
+       	 </if>
+       	  <if test="condition.status != null">
+       	    and t.STATUS = #{condition.status}
+       	 </if>
+       	  <if test="condition.updateTime != null">
+       	    <![CDATA[ and  t.UPDATETIME < #{condition.updateTime} ]]>
+       	 </if>
+       	 <if test="condition.handler != null">
+       	 	and t.HANDLER = #{condition.handler} 
+       	 </if>
+       	 <if test="condition.type != null">
+       	   and t.TYPE = #{condition.type}
+       	</if>
+       	 </where>
+	</update>
+    
+</mapper>

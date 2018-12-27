@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huawei.adapter.dao.intf.MessageDAO">
+
+	<select id="fetchMessage" statementType="CALLABLE" parameterType="map"  resultMap="Message">
+		<![CDATA[
+			{call P_EMAIL_FETCHMESSAGE(				
+				#{i_clusterId, jdbcType=VARCHAR, mode=IN},
+				#{i_directSendCount, jdbcType=INTEGER, mode=IN},
+				#{i_vdnId, jdbcType=INTEGER, mode=IN},
+				#{i_accesscode, jdbcType=VARCHAR, mode=IN})
+			} 
+		 ]]> 
+	</select>
+
+	<update id="updateMessageStatus">
+		update t_wecc_emailmessage set status = #{status}, updatetime = NOW() where id in
+        <foreach collection="ids" item="ids" open="(" separator="," close=")">
+            #{ids, jdbcType=BIGINT}
+        </foreach>
+	</update>
+
+	
+
+	<update id="updateMessageAllToFailed">
+		update t_wecc_emailmessage
+			set status = 4,
+			updatetime = NOW(),
+			calltimes = (calltimes + 1)
+		where status = 2
+		and type= 'ToAgent'
+	</update>
+
+	<resultMap type="com.huawei.adapter.bean.Message" id="Message">
+		<result column="ID" property="id" />
+		<result column="VDNID" property="vdnId" />
+		<result column="ACCESSCODE" property="accessCode" />
+		<result column="SESSIONUSERNAME" property="sessionUserName" />
+		<result column="SENDDATE" property="sendDate" />
+		<result column="ISCREATESESSION" property="isCreateSession" />
+		<result column="REALCALLER" property="realCaller" />
+		<result column="DISPLAYNAME" property="displayName" />
+		<result column="CALLDATA" property="callData" />
+	</resultMap>	
+</mapper>
